@@ -27,15 +27,22 @@ defmodule LargeDiffPayloadWeb.PodcastLive do
   @impl true
   def render(assigns) do
     ~L"""
-    <%= if @podcast do %>
-      <%= live_component(@socket, PodcastDetailsPage, podcast: @podcast, change_event: "podcast_change", change_event_target: "live_view") %>
+    <%= if @podcast_1 do %>
+      <%= live_component(@socket, PodcastDetailsPage, podcast: @podcast_1, change_event: "podcast_1_change", change_event_target: "live_view") %>
+    <% end %>
+    <%= if @podcast_2 do %>
+      <%= live_component(@socket, PodcastDetailsPage, id: "podcast", podcast: @podcast_2, change_event: "podcast_2_change", change_event_target: "live_view") %>
     <% end %>
     """
   end
 
   @impl true
-  def handle_event("podcast_change", %{"podcast" => params}, socket) do
-    {:noreply, update_podcast(socket, params)}
+  def handle_event("podcast_1_change", %{"podcast" => params}, socket) do
+    {:noreply, update_podcast_1(socket, params)}
+  end
+  @impl true
+  def handle_event("podcast_2_change", %{"podcast" => params}, socket) do
+    {:noreply, update_podcast_2(socket, params)}
   end
 
   defp assign_podcast(socket, podcast_id) do
@@ -51,11 +58,15 @@ defmodule LargeDiffPayloadWeb.PodcastLive do
       episodes: Stream.repeatedly(&new_episode/0) |> Enum.take(:random.uniform(10))
     }
 
-    assign(socket, :podcast, podcast)
+    assign(socket, podcast_1: podcast, podcast_2: podcast)
   end
 
-  defp update_podcast(socket, params) do
-    assign(socket, :podcast, %{socket.assigns.podcast | is_feed_public: params["is_feed_public"]})
+  defp update_podcast_1(socket, params) do
+    assign(socket, :podcast_1, %{socket.assigns.podcast_1 | is_feed_public: params["is_feed_public"]})
+  end
+
+  defp update_podcast_2(socket, params) do
+    assign(socket, :podcast_2, %{socket.assigns.podcast_2 | is_feed_public: params["is_feed_public"]})
   end
 
   defp new_feed() do
